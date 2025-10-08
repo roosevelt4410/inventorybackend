@@ -1,17 +1,25 @@
-# Imagen base con JDK 21
-FROM eclipse-temurin:21-jdk
-
-# Establece el directorio de trabajo
+# Etapa 1: Build (compilación del proyecto)
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
-# Copia el código fuente y empaqueta la app
+# Copiar todo el código fuente
 COPY . .
 
-# Compila el proyecto (Render tiene Maven instalado, pero por seguridad lo hacemos desde la imagen)
+# Dar permisos de ejecución al wrapper de Maven
+RUN chmod +x mvnw
+
+# Compilar y empaquetar el proyecto (sin ejecutar tests)
 RUN ./mvnw clean package -DskipTests
 
-# Expone el puerto 8080 (Render lo necesita para mapear tráfico)
+# Etapa 2: Runtime (ejecución de la app)
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Copiar el .jar generado desde la etapa anterior
+COPY --from=build /app/target/*.jar app.jar
+
+# Exponer el puerto que usa Spring Boot
 EXPOSE 8080
 
-# Ejecuta la aplicación
-CMD ["java", "-jar", "target/inventorybackend-0.0.1-SNAPSHOT.jar"]
+# Comando de inicio
+ENTRYPOINT ["java", "-jar", "app.jar"]
