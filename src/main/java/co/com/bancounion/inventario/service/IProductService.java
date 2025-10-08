@@ -11,6 +11,7 @@ public interface IProductService {
 	List<Product> findAll();
     Optional<Product> findById(UUID id);
     Product save(Product product);
+    Product update(UUID id, Product product);
     void deleteById(UUID id);
 
 }

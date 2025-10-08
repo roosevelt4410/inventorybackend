@@ -1,5 +1,6 @@
 package co.com.bancounion.inventario.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -7,6 +8,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -25,14 +28,19 @@ public class Product {
     private String sku;
     private String description;
 
-    @Column(nullable = false)
-    private double price;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false)
     private int stock;
+    
+    private String imageUrl;   
 
     private Integer minStock;
-    private String category;
+    
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -61,8 +69,8 @@ public class Product {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
@@ -70,9 +78,19 @@ public class Product {
     public Integer getMinStock() { return minStock; }
     public void setMinStock(Integer minStock) { this.minStock = minStock; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+    
+    
 }
