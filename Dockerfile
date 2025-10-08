@@ -5,7 +5,7 @@ WORKDIR /app
 # Copiar todo el código fuente
 COPY . .
 
-# Dar permisos de ejecución al wrapper de Maven
+# Dar permisos de ejecución al wrapper de Maven (necesario en Linux)
 RUN chmod +x mvnw
 
 # Compilar y empaquetar el proyecto (sin ejecutar tests)
