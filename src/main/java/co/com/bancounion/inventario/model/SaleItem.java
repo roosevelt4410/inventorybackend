@@ -3,6 +3,8 @@ package co.com.bancounion.inventario.model;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +24,7 @@ public class SaleItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_id")
+    @JsonIgnoreProperties("sale_items")
     private Sale sale;
 
     @ManyToOne(fetch = FetchType.LAZY)

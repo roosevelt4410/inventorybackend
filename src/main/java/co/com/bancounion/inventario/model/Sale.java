@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +34,7 @@ public class Sale {
     @Column(name = "sale_date", nullable = false)
     private LocalDateTime saleDate = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sale")
     private List<SaleItem> items;
 
     // Getters y Setters
