@@ -22,7 +22,7 @@ public class SaleItem {
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "sale_id")
     @JsonIgnoreProperties("items")
     private Sale sale;
