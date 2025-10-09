@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.com.bancounion.inventario.model.Category;
 import co.com.bancounion.inventario.model.Product;
+import co.com.bancounion.inventario.service.ICategoryService;
 import co.com.bancounion.inventario.service.IProductService;
 
 @CrossOrigin(origins = "*")
@@ -23,9 +25,11 @@ public class ProductController {
 
 	
 	private final IProductService service;
+	private final ICategoryService serviceCategori;
 
-    public ProductController(IProductService service) {
+    public ProductController(IProductService service, ICategoryService serviceCategori) {
         this.service = service;
+        this.serviceCategori = serviceCategori;
     }
 
     @GetMapping
@@ -41,6 +45,11 @@ public class ProductController {
 
     @PostMapping
     public Product create(@RequestBody Product product) {
+        if (product.getCategory() != null && product.getCategory().getId() != null) {
+            Category cat = serviceCategori.findById(product.getCategory().getId())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+            product.setCategory(cat);
+        }
         return service.save(product);
     }
 
