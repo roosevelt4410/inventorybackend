@@ -4,13 +4,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import co.com.bancounion.inventario.model.Customer;
-import co.com.bancounion.inventario.model.Sale;
+import org.springframework.stereotype.Service;
+
 import co.com.bancounion.inventario.model.SaleItem;
-import co.com.bancounion.inventario.repository.ICustomerRepository;
+
 import co.com.bancounion.inventario.repository.ISaleItemRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
+@Service
+@Transactional
 public class ISaleItemServiceImpl implements ISaleItemService{
 
 	private final ISaleItemRepository repository;
