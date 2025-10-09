@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.com.bancounion.inventario.model.Category;
-import co.com.bancounion.inventario.model.Customer;
 import co.com.bancounion.inventario.model.Product;
-import co.com.bancounion.inventario.service.ICategoryService;
 import co.com.bancounion.inventario.service.IProductService;
 
 @CrossOrigin(origins = "*")
@@ -26,11 +23,9 @@ public class ProductController {
 
 	
 	private final IProductService service;
-	private final ICategoryService serviceCategori;
 
-    public ProductController(IProductService service, ICategoryService serviceCategori) {
+    public ProductController(IProductService service) {
         this.service = service;
-        this.serviceCategori = serviceCategori;
     }
 
     @GetMapping
