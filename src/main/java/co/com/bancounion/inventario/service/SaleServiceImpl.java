@@ -39,43 +39,39 @@ public class SaleServiceImpl implements ISaleService{
 	    }
 	    @Override
 	    public Sale create(Sale sale) {
-	        BigDecimal total = BigDecimal.ZERO;
+	    	BigDecimal total = BigDecimal.ZERO;
 
-	        // Validar que haya items
 	        if (sale.getItems() == null || sale.getItems().isEmpty()) {
 	            throw new IllegalArgumentException("La venta debe tener al menos un item");
 	        }
 
 	        for (SaleItem item : sale.getItems()) {
-	            // Traer el product completo de la BD
 	            Product product = productRepository.findById(item.getProduct().getId())
 	                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado en venta"));
 
-	            // Validar stock
 	            if (product.getStock() < item.getQuantity()) {
 	                throw new IllegalStateException("Stock insuficiente para el producto: " + product.getName());
 	            }
 
-	            // Actualizar stock
+	            // Actualizar stock del producto existente
 	            product.setStock(product.getStock() - item.getQuantity());
 	            productRepository.save(product);
 
 	            // Calcular precios
 	            item.setUnitPrice(product.getPrice());
 	            item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+	            item.setPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
-	            // 🔑 Asignar la venta y el product completo al item
+	            // Asignar la venta y producto existente
 	            item.setSale(sale);
-	            item.setProduct(product); // <— este es el cambio clave
+	            item.setProduct(product);
 
 	            total = total.add(item.getSubtotal());
 	        }
 
-	        // Asignar total calculado
 	        sale.setTotal(total);
 
-	        // Guardar la venta con todos los items
-	        return saleRepository.save(sale);
+	        return saleRepository.save(sale); // Aquí se guardan los items automáticamente
 	    }
 
 
