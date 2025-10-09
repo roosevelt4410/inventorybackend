@@ -39,39 +39,44 @@ public class SaleServiceImpl implements ISaleService{
 	    }
 	    @Override
 	    public Sale create(Sale sale) {
-	    	BigDecimal total = BigDecimal.ZERO;
+	    	 BigDecimal total = BigDecimal.ZERO;
 
-	        if (sale.getItems() == null || sale.getItems().isEmpty()) {
-	            throw new IllegalArgumentException("La venta debe tener al menos un item");
-	        }
+	    	    if (sale.getItems() == null || sale.getItems().isEmpty()) {
+	    	        throw new IllegalArgumentException("La venta debe tener al menos un item");
+	    	    }
 
-	        for (SaleItem item : sale.getItems()) {
-	            Product product = productRepository.findById(item.getProduct().getId())
-	                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado en venta"));
+	    	    for (SaleItem item : sale.getItems()) {
+	    	        Product product = productRepository.findById(item.getProduct().getId())
+	    	                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado en venta"));
 
-	            if (product.getStock() < item.getQuantity()) {
-	                throw new IllegalStateException("Stock insuficiente para el producto: " + product.getName());
-	            }
+	    	        if (product.getStock() < item.getQuantity()) {
+	    	            throw new IllegalStateException("Stock insuficiente para el producto: " + product.getName());
+	    	        }
 
-	            // Actualizar stock del producto existente
-	            product.setStock(product.getStock() - item.getQuantity());
-	            productRepository.save(product);
+	    	        // Asegurarnos de que el producto tiene nombre
+	    	        if (product.getName() == null || product.getName().isEmpty()) {
+	    	            throw new IllegalStateException("El producto tiene un nombre vacío o nulo");
+	    	        }
 
-	            // Calcular precios
-	            item.setUnitPrice(product.getPrice());
-	            item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-	            item.setPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+	    	        // Actualizar stock del producto existente
+	    	        product.setStock(product.getStock() - item.getQuantity());
+	    	        productRepository.save(product);
 
-	            // Asignar la venta y producto existente
-	            item.setSale(sale);
-	            item.setProduct(product);
+	    	        // Calcular precios
+	    	        item.setUnitPrice(product.getPrice());
+	    	        item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+	    	        item.setPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
-	            total = total.add(item.getSubtotal());
-	        }
+	    	        // Asignar la venta y producto existente
+	    	        item.setSale(sale);
+	    	        item.setProduct(product);
 
-	        sale.setTotal(total);
+	    	        total = total.add(item.getSubtotal());
+	    	    }
 
-	        return saleRepository.save(sale); // Aquí se guardan los items automáticamente
+	    	    sale.setTotal(total);
+
+	    	    return saleRepository.save(sale); // Aquí se
 	    }
 
 
