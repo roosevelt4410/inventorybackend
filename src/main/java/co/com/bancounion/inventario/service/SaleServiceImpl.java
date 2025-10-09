@@ -47,6 +47,7 @@ public class SaleServiceImpl implements ISaleService{
 	        }
 
 	        for (SaleItem item : sale.getItems()) {
+	            // Traer el product completo de la BD
 	            Product product = productRepository.findById(item.getProduct().getId())
 	                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado en venta"));
 
@@ -63,8 +64,9 @@ public class SaleServiceImpl implements ISaleService{
 	            item.setUnitPrice(product.getPrice());
 	            item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
-	            // 🔑 asignar la venta a cada item
+	            // 🔑 Asignar la venta y el product completo al item
 	            item.setSale(sale);
+	            item.setProduct(product); // <— este es el cambio clave
 
 	            total = total.add(item.getSubtotal());
 	        }
@@ -75,6 +77,7 @@ public class SaleServiceImpl implements ISaleService{
 	        // Guardar la venta con todos los items
 	        return saleRepository.save(sale);
 	    }
+
 
 	    @Override
 	    public void delete(UUID id) {
