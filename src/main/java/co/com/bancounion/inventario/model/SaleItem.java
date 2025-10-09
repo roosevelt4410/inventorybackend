@@ -24,7 +24,7 @@ public class SaleItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_id")
-    @JsonIgnoreProperties("sale_items")
+    @JsonIgnoreProperties("items")
     private Sale sale;
 
     @ManyToOne(fetch = FetchType.LAZY)
