@@ -3,8 +3,6 @@ package co.com.bancounion.inventario.model;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +24,7 @@ public class Category {
     private String description;
 
     @OneToMany(mappedBy = "category")
-    @JsonManagedReference
+    //@JsonManagedReference
     private List<Product> products;
 
     // Getters & Setters
