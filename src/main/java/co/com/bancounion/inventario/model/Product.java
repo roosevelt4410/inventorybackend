@@ -24,7 +24,7 @@ public class Product {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
+    
     private String name;
 
     private String sku;

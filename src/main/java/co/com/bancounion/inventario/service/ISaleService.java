@@ -10,5 +10,6 @@ public interface ISaleService {
 	List<Sale> findAll();
 	 Optional<Sale> findById(UUID id);
     Sale create(Sale sale);
+    Sale update(UUID id, Sale product);
     void delete(UUID id);
 }

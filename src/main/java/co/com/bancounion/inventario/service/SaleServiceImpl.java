@@ -39,45 +39,66 @@ public class SaleServiceImpl implements ISaleService{
 	    }
 	    @Override
 	    public Sale create(Sale sale) {
-	    	 BigDecimal total = BigDecimal.ZERO;
+	        BigDecimal total = BigDecimal.ZERO;
 
-	    	    if (sale.getItems() == null || sale.getItems().isEmpty()) {
-	    	        throw new IllegalArgumentException("La venta debe tener al menos un item");
-	    	    }
+	        if (sale.getItems() == null || sale.getItems().isEmpty()) {
+	            throw new IllegalArgumentException("La venta debe tener al menos un item");
+	        }
 
-	    	    for (SaleItem item : sale.getItems()) {
-	    	        Product product = productRepository.findById(item.getProduct().getId())
-	    	                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado en venta"));
+	        for (SaleItem item : sale.getItems()) {
+	            // Buscar el producto
+	            Product product = productRepository.findById(item.getProductId())
+	                    .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
 
-	    	        if (product.getStock() < item.getQuantity()) {
-	    	            throw new IllegalStateException("Stock insuficiente para el producto: " + product.getName());
-	    	        }
+	            // Validar stock
+	            if (product.getStock() < item.getQuantity()) {
+	                throw new IllegalStateException("Stock insuficiente para el producto: " + product.getName());
+	            }
 
-	    	        // Asegurarnos de que el producto tiene nombre
-	    	        if (product.getName() == null || product.getName().isEmpty()) {
-	    	            throw new IllegalStateException("El producto tiene un nombre vacío o nulo");
-	    	        }
+	            // Descontar stock
+	            product.setStock(product.getStock() - item.getQuantity());
+	            productRepository.save(product);
 
-	    	        // Actualizar stock del producto existente
-	    	        product.setStock(product.getStock() - item.getQuantity());
-	    	        productRepository.save(product);
+	            // Copiar información del producto al item
+	            item.setProductId(product.getId());
+	            item.setProductName(product.getName());
+	            item.setUnitPrice(product.getPrice());
+	            item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+	            item.setSale(sale);
 
-	    	        // Calcular precios
-	    	        item.setUnitPrice(product.getPrice());
-	    	        item.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-	    	        item.setPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+	            total = total.add(item.getSubtotal());
+	        }
 
-	    	        // Asignar la venta y producto existente
-	    	        item.setSale(sale);
-	    	        item.setProduct(product);
-
-	    	        total = total.add(item.getSubtotal());
-	    	    }
-
-	    	    sale.setTotal(total);
-
-	    	    return saleRepository.save(sale); // Aquí se
+	        sale.setTotal(total);
+	        return saleRepository.save(sale);
 	    }
+	    
+	    @Override
+	    public Sale update(UUID id, Sale updatedSale) {
+	        Sale existing = saleRepository.findById(id)
+	                .orElseThrow(() -> new EntityNotFoundException("Venta no encontrada con id: " + id));
+
+	        // 🔹 Actualizar datos principales
+	        existing.setCustomer(updatedSale.getCustomer());
+	        existing.setPaymentMethod(updatedSale.getPaymentMethod());
+	        existing.setTotal(updatedSale.getTotal());
+	        existing.setSaleDate(updatedSale.getSaleDate());
+
+	        // 🔹 Limpiar los ítems antiguos y reemplazarlos por los nuevos
+	        existing.getItems().clear();
+
+	        if (updatedSale.getItems() != null) {
+	            updatedSale.getItems().forEach(item -> {
+	                item.setSale(existing); // Mantiene la relación bidireccional
+	                existing.getItems().add(item);
+	            });
+	        }
+
+	        // 🔹 Guardar y devolver
+	        return saleRepository.save(existing);
+	    }
+
+
 
 
 	    @Override
